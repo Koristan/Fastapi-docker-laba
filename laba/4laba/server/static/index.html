@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<style>
+    html {
+        background-color: #f4e1ff;
+    }
+
+    .section {
+        padding: 20px;
+        border: 3px solid #ca29b5;
+        border-radius: 20px;
+    }
+
+    .table {
+        display: flex;
+        gap: 60px;
+    }
+
+    input:not([type=hidden]) {
+        border: none;
+        outline: none;
+        max-width: 300px;
+        width: 100%;
+        border: 1px solid #ca29b5;
+        background-color: #f4e1ff;
+        color: #ca29b5;
+        padding: 10px 25px;
+        border-radius: 10px;
+    }
+
+    button {
+        border: none;
+        outline: none;
+        max-width: 300px;
+        width: 100%;
+        border: 1px solid #ca29b5;
+        background-color: #ca29b5;
+        color: #f4e1ff;
+        padding: 10px 25px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all .3s ease-in-out;
+    }
+
+    button:hover {
+        background-color: #a52a95;
+    }
+</style>
+
+<body>
+    <div class="section">
+        <div class="wrapper">
+            <div class="create-user">
+                <h2>
+                    Создать пользователя
+                </h2>
+                <form id='create-user-table' class="table">
+                    <div class="input-holder">
+                        <h4>Логин</h4>
+                        <input type="text" name="username" placeholder="Логин">
+                    </div>
+                    <div class="input-holder">
+                        <h4>Email</h4>
+                        <input type="text" name="email" placeholder="email">
+                    </div>
+                    <div class="input-holder">
+                        <h4>Полное имя</h4>
+                        <input type="text" name="full_name" placeholder="Полное имя">
+                    </div>
+                    <div class="input-holder">
+                        <h4>Пароль</h4>
+                        <input type="text" name="password" placeholder="Пароль">
+                    </div>
+                    <button onclick="create_user(event)">
+                        Создать
+                    </button>
+                </form>
+            </div>
+
+            <div class="update-user">
+                <h2>
+                    Обновить пользователя
+                </h2>
+                <form id='update-user-table' class="table">
+                    <div class="input-holder">
+                        <h4>ID пользователя</h4>
+                        <input type="number" name="id" id="update-id" placeholder="ID">
+                    </div>
+                    <div class="input-holder">
+                        <h4>Логин</h4>
+                        <input type="text" name="username" placeholder="Логин">
+                    </div>
+                    <div class="input-holder">
+                        <h4>Email</h4>
+                        <input type="text" name="email" placeholder="email">
+                    </div>
+                    <div class="input-holder">
+                        <h4>Полное имя</h4>
+                        <input type="text" name="full_name" placeholder="Полное имя">
+                    </div>
+                    <div class="input-holder">
+                        <h4>Пароль</h4>
+                        <input type="text" name="password" placeholder="Пароль">
+                    </div>
+
+                    <button onclick="update_user(event)">
+                        Обновить
+                    </button>
+                </form>
+            </div>
+
+            <div class="delete-user">
+                <h2>
+                    Удалить пользователя
+                </h2>
+                <form id='delete-user-table' class="table">
+                    <div class="input-holder">
+                        <h4>ID пользователя</h4>
+                        <input type="number" placeholder="ID" id="delete-id">
+                    </div>
+                    <button onclick="delete_user(event)">
+                        Удалить
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        async function create_user(event) {
+            event.preventDefault();  // Предотвращаем стандартное действие формы
+
+            const form = document.getElementById('create-user-table');
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('/register/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                alert(response.ok);
+                // Проверяем успешность ответа
+                if (!response.ok) {
+                    // Получаем данные об ошибке
+                    const errorData = await response.json();
+                    console.log(errorData)
+                    return;  // Прерываем выполнение функции
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert('Произошла ошибка при регистрации. Пожалуйста, попробуйте снова.');
+            }
+        }
+
+        async function update_user(event) {
+            event.preventDefault();  // Предотвращаем стандартное действие формы
+
+            const form = document.getElementById('update-user-table');
+            const id = document.getElementById('update-id').value;
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            console.log(data);
+            try {
+                const response = await fetch('/users/' + id, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                alert(response.ok);
+                // Проверяем успешность ответа
+                if (!response.ok) {
+                    // Получаем данные об ошибке
+                    const errorData = await response.json();
+                    console.log(errorData)
+                    return;  // Прерываем выполнение функции
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert('Произошла ошибка при регистрации. Пожалуйста, попробуйте снова.');
+            }
+        }
+
+        async function delete_user(event) {
+            event.preventDefault();  // Предотвращаем стандартное действие формы
+
+            const form = document.getElementById('delete-user-table');
+            const id = document.getElementById('delete-id').value;
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('/users/' + id, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                alert(response.ok);
+                // Проверяем успешность ответа
+                if (!response.ok) {
+                    // Получаем данные об ошибке
+                    const errorData = await response.json();
+                    console.log(errorData)
+                    return;  // Прерываем выполнение функции
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert('Произошла ошибка при регистрации. Пожалуйста, попробуйте снова.');
+            }
+        }
+    </script>
+</body>
+
+</html>
